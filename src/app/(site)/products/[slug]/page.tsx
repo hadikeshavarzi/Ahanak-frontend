@@ -16,7 +16,7 @@ export async function generateStaticParams() {
   return products
       .filter((p) => p?.slug?.current)
       .map((product) => ({
-        slug: product.slug.current,
+        slug: product.slug?.current as string,
       }));
 }
 
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props) {
   const product = await getProduct(slug);
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
-  if (!product) {
+  if (!product || !product.slug?.current) {
     return {
       title: "محصول پیدا نشد",
       description: "این محصول وجود ندارد",
@@ -74,7 +74,7 @@ const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
   const product = await getProduct(slug);
 
-  if (!product) return notFound();
+  if (!product || !product.slug?.current) return notFound();
 
   const previewImg =
       product?.previewImages?.[0]?.image &&
@@ -92,10 +92,7 @@ const ProductDetails = async ({ params }: Props) => {
     price: product?.price ?? undefined,
     discountedPrice: product?.discountedPrice ?? undefined,
     reviews: product?.reviews?.length ?? 0,
-
-    // 🔥 مهم: null حذف شد، همیشه یا object یا undefined
     category: product?.category ?? undefined,
-
     colors: product?.colors ?? [],
     sizes: product?.sizes ?? [],
     _id: product?._id,
