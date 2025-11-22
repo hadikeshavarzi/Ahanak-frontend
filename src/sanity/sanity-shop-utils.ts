@@ -47,6 +47,7 @@ export async function getCategories() {
     query: allCategoriesQuery,
     qParams: {},
     tags: ["category"],
+    revalidate: 3600,
   });
 }
 
@@ -55,6 +56,7 @@ export async function getCategoryBySlug(slug: string) {
     query: allCategoriesQuery,
     qParams: { slug },
     tags: ["category"],
+    revalidate: 3600,
   });
 }
 
@@ -63,6 +65,7 @@ export async function getCategoryById(id: string) {
     query: categoryByIdQuery,
     qParams: { id },
     tags: ["category"],
+    revalidate: 3600,
   });
 }
 
@@ -71,6 +74,7 @@ export async function getAllProducts() {
     query: allProductsQuery,
     qParams: {},
     tags: ["product", "category"],
+    revalidate: 3600,
   });
 }
 
@@ -82,6 +86,7 @@ export const getProductsByFilter = cache(
         query: filterQuery,
         qParams: {},
         tags,
+        revalidate: 3600,
       });
     },
     ["filtered-products"],
@@ -89,7 +94,9 @@ export const getProductsByFilter = cache(
 );
 
 export async function getAllProductsCount() {
-  return client.fetch<number>(groq`count(*[_type == "product"])`);
+  return client.fetch<number>(groq`count(*[_type == "product"])`, {}, {
+    next: { revalidate: 3600 }
+  });
 }
 
 export async function getProduct(slug: string) {
@@ -97,12 +104,17 @@ export async function getProduct(slug: string) {
     query: groq`*[_type == "product" && slug.current == $slug] ${productData}[0]`,
     tags: ["product"],
     qParams: { slug },
+    revalidate: 3600,
   });
 }
 
 export async function getHighestPrice() {
   return client.fetch<number>(
-      groq`*[_type == "product"] | order(price desc)[0].price`
+      groq`*[_type == "product"] | order(price desc)[0].price`,
+      {},
+      {
+        next: { revalidate: 3600 }
+      }
   );
 }
 
@@ -113,6 +125,7 @@ export async function getOrders(query: string) {
     query: orderQuery,
     qParams: {},
     tags: ["order"],
+    revalidate: 3600,
   });
 }
 
@@ -121,6 +134,7 @@ export async function getOrderById(orderId: string) {
     query: orderByIdQuery,
     qParams: { orderId },
     tags: ["order"],
+    revalidate: 3600,
   });
 }
 
@@ -134,6 +148,7 @@ export const getHeroBanners = cache(
           query: heroBannerQuery,
           qParams: {},
           tags: ["heroBanner"],
+          revalidate: 3600,
         }),
     ["hero-banners"],
     { tags: ["heroBanner"] }
@@ -145,6 +160,7 @@ export const getHeroSliders = cache(
           query: heroSliderQuery,
           qParams: {},
           tags: ["heroSlider"],
+          revalidate: 3600,
         }),
     ["hero-sliders"],
     { tags: ["heroSlider"] }
@@ -163,7 +179,11 @@ export async function getCoupons() {
       discount,
       maxRedemptions,
       timesRedemed
-    }`
+    }`,
+      {},
+      {
+        next: { revalidate: 3600 }
+      }
   );
 }
 
@@ -176,5 +196,6 @@ export async function getCountdown() {
     query: countdownQuery,
     qParams: {},
     tags: ["countdown"],
+    revalidate: 3600,
   });
 }

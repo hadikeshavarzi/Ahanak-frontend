@@ -1,4 +1,3 @@
-import { structuredAlgoliaHtmlData } from "@/algolia/crawlIndex";
 import ShopDetails from "@/components/ShopDetails";
 import {
   getAllProducts,
@@ -79,27 +78,6 @@ const ProductDetails = async ({ params }: Props) => {
   const product = await getProduct(slug);
 
   if (!product || !product.slug?.current) return notFound();
-
-  const previewImg =
-      product?.previewImages?.[0]?.image &&
-      imageBuilder(product.previewImages[0].image).url();
-
-  // ---------------------------
-  // Structured Data for Algolia
-  // ---------------------------
-  await structuredAlgoliaHtmlData({
-    type: "products",
-    title: product?.name ?? "",
-    htmlString: product?.shortDescription ?? "",
-    pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product?.slug?.current}`,
-    imageURL: previewImg ?? "",
-    price: product?.price ?? undefined,
-    discountedPrice: product?.discountedPrice ?? undefined,
-    reviews: product?.reviews?.length ?? 0,
-    category: product?.category ?? undefined,
-    _id: product?._id,
-    status: product?.status ?? true,
-  } as any);
 
   return (
       <main>
