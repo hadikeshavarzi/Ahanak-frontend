@@ -1,29 +1,13 @@
 import ShopDetails from "@/components/ShopDetails";
 import {
-  getAllProducts,
   getProduct,
   imageBuilder,
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// تغییر به dynamic rendering
+// تنظیمات dynamic
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-// ---------------------------
-// Generate Static Params
-// ---------------------------
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-
-  const validProducts = products.filter(
-      (product) => product?.slug?.current
-  );
-
-  return validProducts.map((product) => ({
-    slug: product.slug!.current,
-  }));
-}
 
 // ---------------------------
 // Types

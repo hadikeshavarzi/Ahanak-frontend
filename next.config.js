@@ -24,6 +24,10 @@ const nextConfig = {
       },
     ],
   },
+  // غیرفعال کردن ISR cache
+  experimental: {
+    isrMemoryCacheSize: 0,
+  },
 };
 
 module.exports = nextConfig;
