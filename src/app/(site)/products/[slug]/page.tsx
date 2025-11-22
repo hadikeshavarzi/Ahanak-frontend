@@ -1,26 +1,21 @@
 import ShopDetails from "@/components/ShopDetails";
-import { getAllProducts, getProduct, imageBuilder } from "@/sanity/sanity-shop-utils";
+import { getProduct, imageBuilder } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// ✔ این خط مهم‌ترین چیزه
+// صفحه کاملاً داینامیک
 export const dynamic = "force-dynamic";
-
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-
-  return products.map((product) => ({
-    slug: product?.slug?.current,
-  }));
-}
+export const revalidate = 0;
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
+// -----------------
+// META
+// -----------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
-
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
 
   if (!product) {
@@ -32,14 +27,14 @@ export async function generateMetadata({ params }: Props) {
 
   const previewImage =
       product?.previewImages?.[0]?.image
-          ? imageBuilder(product?.previewImages?.[0]?.image).url()
+          ? imageBuilder(product.previewImages[0].image).url()
           : "/placeholder.png";
 
   return {
     title: `${product.name} | Ahanak`,
     description: product.shortDescription || "",
     alternates: {
-      canonical: `${siteURL}/products/${product?.slug?.current}`,
+      canonical: `${siteURL}/products/${product.slug.current}`,
     },
     openGraph: {
       title: product.name,
@@ -63,6 +58,9 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+// -----------------
+// PAGE
+// -----------------
 const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
 
