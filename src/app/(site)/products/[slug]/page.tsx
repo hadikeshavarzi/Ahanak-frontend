@@ -1,82 +1,68 @@
 import ShopDetails from "@/components/ShopDetails";
-import { getAllProducts, getProduct, imageBuilder } from "@/sanity/sanity-shop-utils";
+import {
+  getProduct,
+  imageBuilder,
+} from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic"; // مهم برای اینکه runtime dynamic error ندهد
+// تنظیمات dynamic rendering
+export const dynamic = 'force-dynamic';
 
 // ---------------------------
-// Build-Time Static Params
+// Types
 // ---------------------------
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-
-  return products
-      .filter((p) => p?.slug?.current)
-      .map((product) => ({
-        slug: product.slug.current,
-      }));
-}
-
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
 // ---------------------------
-// SEO Metadata (Safe Version)
+// SEO Metadata
 // ---------------------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
-  const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
+  const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
-  if (!product) {
+  if (!product || !product.slug?.current) {
     return {
-      title: "Product Not Found",
-      description: "No product found",
+      title: "محصول پیدا نشد",
+      description: "این محصول وجود ندارد",
     };
   }
 
-  const canonicalSlug = product?.slug?.current || "";
-  const previewImage =
-      product?.previewImages?.[0]?.image
-          ? imageBuilder(product.previewImages[0].image).url()
-          : "/placeholder.png";
+  const previewImg = product?.previewImages?.[0]?.image
+      ? imageBuilder(product.previewImages[0].image).url()
+      : "/placeholder.png";
 
   return {
-    title: `${product.name} | Ahanak`,
-    description: product.shortDescription || "",
+    title: `${product.name} | فروشگاه آهنک`,
+    description: product.shortDescription,
     alternates: {
-      canonical: `${siteURL}/products/${canonicalSlug}`,
+      canonical: `${siteURL}/products/${product.slug.current}`,
     },
     openGraph: {
       title: product.name,
       description: product.shortDescription,
-      images: [
-        {
-          url: previewImage,
-          width: 1200,
-          height: 800,
-          alt: product.name,
-        },
-      ],
+      url: `${siteURL}/products/${product.slug.current}`,
+      images: [{ url: previewImg }],
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
-      description: product.shortDescription,
-      images: [previewImage],
+      title: product?.name,
+      description: product?.shortDescription,
+      images: [previewImg],
     },
   };
 }
 
 // ---------------------------
-// Product Page
+// Product Page Component
 // ---------------------------
 const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
   const product = await getProduct(slug);
 
-  if (!product) notFound();
+  if (!product || !product.slug?.current) return notFound();
 
   return (
       <main>
