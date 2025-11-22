@@ -15,10 +15,9 @@ export async function sanityFetch<QueryResponse>({
     revalidate?: number | false;
 }) {
     return client.fetch<QueryResponse>(query, qParams, {
-        cache: "force-cache",
         next: {
-            tags,
-            revalidate,
+            revalidate: revalidate,
+            tags: tags,
         },
     });
 }

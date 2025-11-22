@@ -6,8 +6,9 @@ import {
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// اضافه کردن این خط مهمه
+// 🔥 مهم: اضافه کردن این خط
 export const revalidate = 3600;
+export const dynamic = 'force-static';
 
 // ---------------------------
 // Generate Static Params

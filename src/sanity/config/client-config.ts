@@ -13,7 +13,7 @@ const config: ClientConfig = {
   projectId,
   dataset,
   apiVersion: "2023-03-09",
-  useCdn: false, // تغییر از true به false
+  useCdn: false,
   token: process.env.SANITY_PROJECT_API_TOKEN,
   perspective: "published",
 };
