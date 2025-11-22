@@ -1,15 +1,15 @@
-import { client } from "@/sanity/sanity-utils";
 import { Blog } from "@/types/blogItem";
 import { PortableText } from "@portabletext/react";
 import { getImageDimensions } from "@sanity/asset-utils";
 import urlBuilder from "@sanity/image-url";
+import config from "@/sanity/config/client-config"; // ❗ مهم
 import Image from "next/image";
 
-// Lazy Image Component
+// Lazy-loaded image component
 const SampleImageComponent = ({ value, isInline }: any) => {
     const { width, height } = getImageDimensions(value);
 
-    const imageUrl = urlBuilder(client)
+    const imageUrl = urlBuilder(config)
         .image(value)
         .fit("max")
         .auto("format")
@@ -37,7 +37,11 @@ const components = {
 };
 
 const RenderBodyContent = ({ post }: { post: Blog }) => {
-    return <PortableText value={post?.body || []} components={components} />;
+    return (
+        <div className="prose prose-lg max-w-none">
+            <PortableText value={post?.body || []} components={components} />
+        </div>
+    );
 };
 
 export default RenderBodyContent;
