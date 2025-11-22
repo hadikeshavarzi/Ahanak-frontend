@@ -11,19 +11,31 @@ import heroSlider from "./hero-slider";
 import coupon from "./coupon";
 import countdown from "./countdown";
 
-const schemas = [
+// تکسونومی‌ها
+import taxonomies from "./taxonomies";
+
+// تولیدکننده‌ها (manufactor)
+import manufactor from "./manufactor";
+
+// خروجی نهایی
+export const schemaTypes = [
   product,
-  post,
-  author,
-  order,
   category,
+  manufactor,
+  ...taxonomies,
+
+  post,
   postCategory,
+  author,
   review,
-  blockContent,
+  order,
+
   heroBanner,
   heroSlider,
   coupon,
   countdown,
+
+  blockContent,
 ];
 
-export default schemas;
+export default schemaTypes;

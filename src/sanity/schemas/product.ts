@@ -1,354 +1,167 @@
-const product = {
+import { defineField, defineType } from "sanity";
+
+export default defineType({
   name: "product",
-  title: "Product",
+  title: "محصول",
   type: "document",
+
   fields: [
-    {
+    defineField({
       name: "name",
-      title: "Name",
+      title: "نام محصول",
       type: "string",
-      validation: (Rule: any) => Rule.required(),
-    },
-    {
-      name: "description",
-      title: "Description",
-      type: "blockContent",
-    },
-    {
-      name: "shortDescription",
-      title: "Short Description",
-      type: "string",
-      validation: (Rule: any) => Rule.required(),
-    },
-    {
-      name: "category",
-      title: "Category",
-      type: "reference",
-      to: { type: "category" },
-      validation: (Rule: any) => Rule.required(),
-    },
-    {
-      name: "price",
-      title: "Price",
-      type: "number",
-      validation: (Rule: any) => Rule.required(),
-    },
-    {
-      name: "discountedPrice",
-      title: "Price After Discount",
-      type: "number",
-      validation: (Rule: any) => Rule.required(),
-    },
+      validation: (Rule) => Rule.required(),
+    }),
 
-    {
-      name: "offers",
-      title: "Offers",
-      type: "array",
-      of: [
-        {
-          type: "string",
-          title: "Offer",
-        },
-      ],
-    },
-
-    {
+    defineField({
       name: "slug",
-      title: "Slug",
+      title: "اسلاگ",
       type: "slug",
       options: {
         source: "name",
-        unique: true,
-        slugify: (input: any) => {
-          return input
+        slugify: (input) =>
+          input
             .toLowerCase()
             .replace(/\s+/g, "-")
-            .replace(/[^\w-]+/g, "");
-        },
+            .replace(/[^\w-]+/g, ""),
       },
-      validation: (Rule: any) =>
-        Rule.required().custom((fields: any) => {
-          if (
-            fields?.current !== fields?.current?.toLowerCase() ||
-            fields?.current.split(" ").includes("")
-          ) {
-            return "Slug must be lowercase and not be included space";
-          }
-          return true;
-        }),
-    },
-    {
-      name: "tags",
-      title: "Tags",
-      type: "array",
-      of: [
-        {
-          type: "string",
-          title: "Tag",
-          validation: (Rule: any) =>
-            Rule.custom((fields: any) => {
-              if (
-                fields !== fields.toLowerCase() ||
-                fields.split(" ").includes("")
-              ) {
-                return "Tags must be lowercase and not be included space";
-              }
-              return true;
-            }),
-        },
-      ],
-    },
-    {
-      name: "colors",
-      title: "Colors",
-      type: "array",
-      of: [
-        {
-          type: "string",
-          title: "Color",
-          validation: (Rule: any) =>
-            Rule.custom((fields: any) => {
-              if (
-                fields !== fields.toLowerCase() ||
-                fields.split(" ").includes("")
-              ) {
-                return "Colors must be lowercase and not be included space";
-              }
-              return true;
-            }),
-        },
-      ],
-    },
+      validation: (Rule) => Rule.required(),
+    }),
 
-    {
-      name: "sizes",
-      title: "Sizes",
-      type: "array",
-      of: [
-        {
-          type: "string",
-          title: "Size",
-          validation: (Rule: any) =>
-            Rule.custom((fields: any) => {
-              if (
-                fields !== fields.toLowerCase() ||
-                fields.split(" ").includes("")
-              ) {
-                return "size must be lowercase and not be included space";
-              }
-              return true;
-            }),
-        },
-      ],
-    },
-    {
-      name: "customAttributes",
-      title: "Custom Attributes",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "customAttribute",
-          title: "Custom Attribute",
-          fields: [
-            {
-              name: "attributeName",
-              title: "Attribute Name",
-              type: "string",
-              validation: (Rule: any) => Rule.required(),
-            },
-            {
-              name: "attributeValues",
-              title: "Attribute Values",
-              type: "array",
-              of: [
-                {
-                  type: "object",
-                  name: "attributeValue",
-                  title: "Attribute Value",
-                  fields: [
-                    {
-                      name: "id",
-                      title: "ID",
-                      type: "string",
-                      validation: (Rule: any) => Rule.required(),
-                    },
-                    {
-                      name: "title",
-                      title: "Title",
-                      type: "string",
-                      validation: (Rule: any) => Rule.required(),
-                    },
-                  ],
-                  preview: {
-                    select: {
-                      title: "title",
-                      subtitle: "id",
-                    },
-                  },
-                },
-              ],
-              validation: (Rule: any) => Rule.required(),
-            },
-          ],
-          preview: {
-            select: {
-              title: "attributeName",
-              subtitle: "attributeValues.0.title",
-            },
-          },
-        },
-      ],
-    },
+    defineField({
+      name: "shortDescription",
+      title: "توضیح کوتاه",
+      type: "string",
+    }),
 
-    {
-      name: "additionalInformation",
-      title: "Additional Information",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "additionalInfo",
-          title: "Additional Info",
-          fields: [
-            {
-              name: "name",
-              title: "Name",
-              type: "string",
-              validation: (Rule: any) => Rule.required(),
-            },
-            {
-              name: "description",
-              title: "Description",
-              type: "string",
-              validation: (Rule: any) => Rule.required(),
-            },
-          ],
-          preview: {
-            select: {
-              title: "name",
-              subtitle: "description",
-            },
-          },
-        },
-      ],
-    },
-    {
-      name: "thumbnails",
-      title: "Thumbnails",
-      type: "array",
-      validation: (Rule: any) => Rule.required(),
-      of: [
-        {
-          type: "object",
-          name: "thumbnail",
-          title: "Thumbnail",
-          fields: [
-            {
-              name: "image",
-              title: "Image",
-              type: "image",
-              options: {
-                hotspot: true,
-              },
-            },
-            {
-              name: "color",
-              title: "Color",
-              type: "string",
-            },
-          ],
-          preview: {
-            select: {
-              title: "color",
-              media: "image",
-            },
-            prepare(selection: any) {
-              const { title, media } = selection;
-              return {
-                title: title || "Thumbnail",
-                media,
-              };
-            },
-          },
-        },
-      ],
-    },
-    {
-      name: "previewImages",
-      title: "Preview Images",
-      type: "array",
-      validation: (Rule: any) => Rule.required(),
-
-      of: [
-        {
-          type: "object",
-          name: "previewImage",
-          title: "Preview Image",
-          fields: [
-            {
-              name: "image",
-              title: "Image",
-              type: "image",
-              options: {
-                hotspot: true,
-              },
-            },
-            {
-              name: "color",
-              title: "Color",
-              type: "string",
-            },
-          ],
-          preview: {
-            select: {
-              title: "color",
-              media: "image",
-            },
-            prepare(selection: any) {
-              const { title, media } = selection;
-              return {
-                title: title || "Preview Image",
-                media,
-              };
-            },
-          },
-        },
-      ],
-    },
-    {
-      name: "publishedAt",
-      title: "Published at",
-      type: "datetime",
-      validation: (Rule: any) => Rule.required(),
-    },
-    {
-      name: "status",
-      title: "Stock Status",
-      type: "boolean",
-    },
-
-    {
-      name: "body",
-      title: "Body",
+    defineField({
+      name: "description",
+      title: "توضیح کامل",
       type: "blockContent",
+    }),
+
+    defineField({
+      name: "category",
+      title: "دسته‌بندی اصلی",
+      type: "reference",
+      to: [{ type: "category" }],
+      validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
+      name: "manufactor",
+      title: "کارخانه تولیدکننده",
+      type: "reference",
+      to: [{ type: "manufactor" }],
+    }),
+
+    // -------------------------
+    // 🎯 ویژگی‌های محصول (پایه)
+    // -------------------------
+    defineField({
+      name: "price",
+      title: "قیمت",
+      type: "number",
+    }),
+
+    defineField({
+      name: "discountedPrice",
+      title: "قیمت پس از تخفیف",
+      type: "number",
+    }),
+
+    defineField({
+      name: "status",
+      title: "موجودی",
+      type: "boolean",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "publishedAt",
+      title: "تاریخ انتشار",
+      type: "datetime",
+      validation: (Rule) => Rule.required(),
+    }),
+
+    // -------------------------
+    // 🎯 تصاویر
+    // -------------------------
+    defineField({
+      name: "thumbnails",
+      title: "تصاویر اصلی",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "image", type: "image", title: "تصویر", options: { hotspot: true } },
+            { name: "color", type: "string", title: "رنگ" },
+          ],
+        },
+      ],
+    }),
+
+    defineField({
+      name: "previewImages",
+      title: "گالری تصاویر",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "image", type: "image", title: "تصویر", options: { hotspot: true } },
+            { name: "color", type: "string", title: "رنگ" },
+          ],
+        },
+      ],
+    }),
+
+    // -------------------------
+    // 🎯 ویژگی‌های محصول (گروه کامل – تمام تکسونومی‌ها)
+    // -------------------------
+    {
+      name: "attributes",
+      title: "ویژگی‌های محصول",
+      type: "object",
+      fields: [
+        { name: "size", title: "سایز", type: "array", of: [{ type: "reference", to: [{ type: "size" }] }] },
+        { name: "standard", title: "استاندارد", type: "array", of: [{ type: "reference", to: [{ type: "standard" }] }] },
+        { name: "condition", title: "حالت", type: "array", of: [{ type: "reference", to: [{ type: "condition" }] }] },
+        { name: "thick", title: "ضخامت", type: "array", of: [{ type: "reference", to: [{ type: "thick" }] }] },
+        { name: "length", title: "طول", type: "array", of: [{ type: "reference", to: [{ type: "length" }] }] },
+        { name: "width", title: "عرض", type: "array", of: [{ type: "reference", to: [{ type: "width" }] }] },
+        { name: "grid", title: "گرید", type: "array", of: [{ type: "reference", to: [{ type: "grid" }] }] },
+        { name: "perinch", title: "سایز اینچ", type: "array", of: [{ type: "reference", to: [{ type: "perinch" }] }] },
+        { name: "weight", title: "وزن", type: "array", of: [{ type: "reference", to: [{ type: "weight" }] }] },
+        { name: "deliveryPlace", title: "محل تحویل", type: "array", of: [{ type: "reference", to: [{ type: "deliveryPlace" }] }] },
+      ],
     },
+
+    // -------------------------
+    // 🎯 اطلاعات اضافی (برای SEO + قالب)
+    // -------------------------
+    defineField({
+      name: "additionalInformation",
+      title: "اطلاعات اضافه",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "name", type: "string", title: "نام" },
+            { name: "description", type: "string", title: "توضیحات" },
+          ],
+        },
+      ],
+    }),
   ],
+
   preview: {
     select: {
       title: "name",
-      description: "shortDescription",
-      category: "category.title",
       media: "thumbnails.0.image",
-    },
-    prepare(selection: any) {
-      const { description, category, media } = selection;
-      return {
-        title: selection.title,
-        subtitle: category,
-        media,
-      };
+      subtitle: "category.title",
     },
   },
-};
-export default product;
+});
