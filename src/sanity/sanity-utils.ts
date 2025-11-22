@@ -16,8 +16,8 @@ export async function sanityFetch<QueryResponse>({
 }) {
     return client.fetch<QueryResponse>(query, qParams, {
         next: {
-            revalidate: revalidate,
-            tags: tags,
+            revalidate,
+            tags,
         },
     });
 }

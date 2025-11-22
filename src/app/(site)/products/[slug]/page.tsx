@@ -6,13 +6,11 @@ import {
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// 🔥 مهم: اضافه کردن این خط
+// 🔥 اضافه کردن این خطوط
 export const revalidate = 3600;
 export const dynamic = 'force-static';
+export const fetchCache = 'force-cache';
 
-// ---------------------------
-// Generate Static Params
-// ---------------------------
 export async function generateStaticParams() {
   const products = await getAllProducts();
 
@@ -25,16 +23,10 @@ export async function generateStaticParams() {
   }));
 }
 
-// ---------------------------
-// Types
-// ---------------------------
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// ---------------------------
-// SEO Metadata
-// ---------------------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
@@ -72,10 +64,7 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-// ---------------------------
-// Product Page Component
-// ---------------------------
-const ProductDetails = async ({ params }: Props) => {
+const ProductDetails = async ({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
 
