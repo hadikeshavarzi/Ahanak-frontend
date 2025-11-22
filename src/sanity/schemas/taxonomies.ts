@@ -1,6 +1,6 @@
 import { defineType, defineField } from "sanity";
 
-// Utility function to generate taxonomies
+// Utility function to create a taxonomy schema
 const createTaxonomy = (name: string, title: string) =>
     defineType({
       name,
@@ -21,11 +21,15 @@ const createTaxonomy = (name: string, title: string) =>
             source: "title",
             maxLength: 96,
           },
+          validation: (Rule) => Rule.required(),
         }),
       ],
+      preview: {
+        select: { title: "title" },
+      },
     });
 
-// Array of all taxonomies
+// All taxonomies including "grid"
 const taxonomies = [
   createTaxonomy("size", "سایز"),
   createTaxonomy("standard", "استاندارد"),
@@ -39,7 +43,8 @@ const taxonomies = [
   createTaxonomy("ghotr", "قطر بیرونی"),
   createTaxonomy("weight", "وزن"),
   createTaxonomy("deliveryPlace", "محل تحویل"),
+  createTaxonomy("grid", "گرید"), // 🔥 اضافه شد
 ];
 
-// MUST be default export so index.ts can import taxonomies
+// MUST be default export for schema registration
 export default taxonomies;
