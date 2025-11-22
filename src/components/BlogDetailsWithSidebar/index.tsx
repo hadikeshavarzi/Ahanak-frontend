@@ -10,6 +10,7 @@ import SearchForm from "../Blog/SearchForm";
 import SocialShare from "../Blog/SocialShare";
 import Tags from "../Blog/Tags";
 import Breadcrumb from "../Common/Breadcrumb";
+
 export const dynamic = 'force-dynamic';
 
 const BlogDetailsWithSidebar = ({ blogData }: { blogData: Blog }) => {
@@ -91,7 +92,10 @@ const BlogDetailsWithSidebar = ({ blogData }: { blogData: Blog }) => {
                       </ul>
                     </div>
 
-                    <SocialShare slug={blogData?.slug} />
+                    {/* ✅ چک کنید قبل از پاس دادن */}
+                    {blogData?.slug?.current && (
+                        <SocialShare slug={blogData.slug.current} />
+                    )}
                   </div>
                 </div>
               </div>
