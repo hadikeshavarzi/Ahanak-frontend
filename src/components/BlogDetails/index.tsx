@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SocialShare from "../Blog/SocialShare";
 import Breadcrumb from "../Common/Breadcrumb";
+export const dynamic = 'force-dynamic';
 
 const BlogDetails = ({ blogData }: { blogData: Blog }) => {
   return (
