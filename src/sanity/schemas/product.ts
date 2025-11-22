@@ -20,10 +20,10 @@ export default defineType({
       options: {
         source: "name",
         slugify: (input) =>
-          input
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^\w-]+/g, ""),
+            input
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^\w-]+/g, ""),
       },
       validation: (Rule) => Rule.required(),
     }),
@@ -55,9 +55,6 @@ export default defineType({
       to: [{ type: "manufactor" }],
     }),
 
-    // -------------------------
-    // 🎯 ویژگی‌های محصول (پایه)
-    // -------------------------
     defineField({
       name: "price",
       title: "قیمت",
@@ -85,7 +82,7 @@ export default defineType({
     }),
 
     // -------------------------
-    // 🎯 تصاویر
+    // تصاویر
     // -------------------------
     defineField({
       name: "thumbnails",
@@ -118,7 +115,7 @@ export default defineType({
     }),
 
     // -------------------------
-    // 🎯 ویژگی‌های محصول (گروه کامل – تمام تکسونومی‌ها)
+    // ویژگی‌ها بدون grid
     // -------------------------
     {
       name: "attributes",
@@ -131,16 +128,13 @@ export default defineType({
         { name: "thick", title: "ضخامت", type: "array", of: [{ type: "reference", to: [{ type: "thick" }] }] },
         { name: "length", title: "طول", type: "array", of: [{ type: "reference", to: [{ type: "length" }] }] },
         { name: "width", title: "عرض", type: "array", of: [{ type: "reference", to: [{ type: "width" }] }] },
-        { name: "grid", title: "گرید", type: "array", of: [{ type: "reference", to: [{ type: "grid" }] }] },
+        // ❌ grid حذف شد
         { name: "perinch", title: "سایز اینچ", type: "array", of: [{ type: "reference", to: [{ type: "perinch" }] }] },
         { name: "weight", title: "وزن", type: "array", of: [{ type: "reference", to: [{ type: "weight" }] }] },
         { name: "deliveryPlace", title: "محل تحویل", type: "array", of: [{ type: "reference", to: [{ type: "deliveryPlace" }] }] },
       ],
     },
 
-    // -------------------------
-    // 🎯 اطلاعات اضافی (برای SEO + قالب)
-    // -------------------------
     defineField({
       name: "additionalInformation",
       title: "اطلاعات اضافه",
