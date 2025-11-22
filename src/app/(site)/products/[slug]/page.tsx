@@ -20,7 +20,7 @@ export async function generateStaticParams() {
 
   // map کردن به فرمت مورد نیاز
   return validProducts.map((product) => ({
-    slug: product.slug!.current, // اینجا مطمئنیم که slug وجود داره
+    slug: product.slug!.current,
   }));
 }
 
@@ -97,12 +97,12 @@ const ProductDetails = async ({ params }: Props) => {
     discountedPrice: product?.discountedPrice ?? undefined,
     reviews: product?.reviews?.length ?? 0,
     category: product?.category ?? undefined,
-    colors: product?.colors ?? [],
-    sizes: product?.sizes ?? [],
+    colors: product?.colors ?? undefined,
+    sizes: product?.sizes ?? undefined,
     _id: product?._id,
-    thumbnails: product?.thumbnails ?? [],
+    thumbnails: product?.thumbnails ?? undefined,
     status: product?.status ?? true,
-    previewImages: product?.previewImages ?? [],
+    previewImages: product?.previewImages ?? undefined,
   });
 
   return (
