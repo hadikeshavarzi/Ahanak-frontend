@@ -94,8 +94,11 @@ export const getProductsByFilter = cache(
 );
 
 export async function getAllProductsCount() {
-  return client.fetch<number>(groq`count(*[_type == "product"])`, {}, {
-    next: { revalidate: 3600 }
+  return sanityFetch<number>({
+    query: groq`count(*[_type == "product"])`,
+    qParams: {},
+    tags: ["product"],
+    revalidate: 3600,
   });
 }
 
@@ -109,13 +112,12 @@ export async function getProduct(slug: string) {
 }
 
 export async function getHighestPrice() {
-  return client.fetch<number>(
-      groq`*[_type == "product"] | order(price desc)[0].price`,
-      {},
-      {
-        next: { revalidate: 3600 }
-      }
-  );
+  return sanityFetch<number>({
+    query: groq`*[_type == "product"] | order(price desc)[0].price`,
+    qParams: {},
+    tags: ["product"],
+    revalidate: 3600,
+  });
 }
 
 export async function getOrders(query: string) {
@@ -171,8 +173,8 @@ export const getHeroSliders = cache(
 // ----------------------------
 
 export async function getCoupons() {
-  return client.fetch(
-      groq`*[_type == "coupon"] {
+  return sanityFetch<any[]>({
+    query: groq`*[_type == "coupon"] {
       _id,
       name,
       code,
@@ -180,11 +182,10 @@ export async function getCoupons() {
       maxRedemptions,
       timesRedemed
     }`,
-      {},
-      {
-        next: { revalidate: 3600 }
-      }
-  );
+    qParams: {},
+    tags: ["coupon"],
+    revalidate: 3600,
+  });
 }
 
 // ----------------------------
