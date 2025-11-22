@@ -42,7 +42,6 @@ export const perinch = createTaxonomy("perinch", "سایز به اینچ");
 export const ghotr = createTaxonomy("ghotr", "قطر بیرونی");
 export const weight = createTaxonomy("weight", "وزن");
 export const deliveryPlace = createTaxonomy("deliveryPlace", "محل تحویل");
-export const grid = createTaxonomy("grid", "گرید");
 
 // ✅ MUST be array for spreading in schema
 const taxonomies = [
@@ -58,7 +57,7 @@ const taxonomies = [
     ghotr,
     weight,
     deliveryPlace,
-    grid,
+
 ];
 
 export default taxonomies;
