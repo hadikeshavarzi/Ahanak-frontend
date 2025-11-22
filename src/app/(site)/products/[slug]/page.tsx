@@ -1,68 +1,66 @@
 import ShopDetails from "@/components/ShopDetails";
-import {
-  getProduct,
-  imageBuilder,
-} from "@/sanity/sanity-shop-utils";
+import { getAllProducts, getProduct, imageBuilder } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// تنظیمات dynamic rendering
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-// ---------------------------
-// Types
-// ---------------------------
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+
+  return (
+      products
+          ?.filter((p) => p?.slug?.current)
+          ?.map((p) => ({
+            slug: p.slug!.current,
+          })) ?? []
+  );
+}
+
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// ---------------------------
-// SEO Metadata
-// ---------------------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
+
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
-  if (!product || !product.slug?.current) {
+  if (!product) {
     return {
-      title: "محصول پیدا نشد",
-      description: "این محصول وجود ندارد",
+      title: "Not Found",
+      description: "Product not found",
     };
   }
 
-  const previewImg = product?.previewImages?.[0]?.image
-      ? imageBuilder(product.previewImages[0].image).url()
-      : "/placeholder.png";
+  const previewImg =
+      product?.previewImages?.[0]?.image
+          ? imageBuilder(product.previewImages[0].image).url()
+          : "/placeholder.png";
 
   return {
-    title: `${product.name} | فروشگاه آهنک`,
-    description: product.shortDescription,
+    title: product.name,
+    description: product.shortDescription ?? "",
     alternates: {
-      canonical: `${siteURL}/products/${product.slug.current}`,
+      canonical: `${siteURL}/products/${product.slug?.current ?? ""}`,
     },
     openGraph: {
       title: product.name,
       description: product.shortDescription,
-      url: `${siteURL}/products/${product.slug.current}`,
-      images: [{ url: previewImg }],
+      images: [previewImg],
     },
     twitter: {
       card: "summary_large_image",
-      title: product?.name,
-      description: product?.shortDescription,
       images: [previewImg],
     },
   };
 }
 
-// ---------------------------
-// Product Page Component
-// ---------------------------
 const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
-  const product = await getProduct(slug);
 
-  if (!product || !product.slug?.current) return notFound();
+  const product = await getProduct(slug);
+  if (!product) notFound();
 
   return (
       <main>
