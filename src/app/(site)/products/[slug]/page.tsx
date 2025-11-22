@@ -7,100 +7,101 @@ import {
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// -----------------------------
-// Generate static paths
-// -----------------------------
+// ---------------------------
+// Generate Static Params
+// ---------------------------
 export async function generateStaticParams() {
   const products = await getAllProducts();
-  return products.map((product) => ({
-    slug: product?.slug?.current,
-  }));
+
+  return products
+      .filter((p) => p?.slug?.current)
+      .map((product) => ({
+        slug: product.slug.current,
+      }));
 }
 
+// ---------------------------
+// Types
+// ---------------------------
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// -----------------------------
-// Metadata with Safe Fallbacks
-// -----------------------------
+// ---------------------------
+// SEO Metadata
+// ---------------------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
-
-  const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
-  const placeholder = "/placeholder.png";
+  const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
   if (!product) {
     return {
-      title: "Not Found",
-      description: "No product found",
+      title: "محصول پیدا نشد",
+      description: "این محصول وجود ندارد",
     };
   }
 
-  const previewImageUrl = product?.previewImages?.[0]?.image
+  const previewImg = product?.previewImages?.[0]?.image
       ? imageBuilder(product.previewImages[0].image).url()
-      : placeholder;
+      : "/placeholder.png";
 
   return {
-    title: `${product?.name || "Single Product Page"} | Ahanak`,
-    description: `${product?.shortDescription?.slice(0, 150) || ""}...`,
-
-    openGraph: {
-      title: `${product?.name} | Ahanak`,
-      description: product?.shortDescription,
-      url: `${siteURL}/products/${product?.slug?.current}`,
-      siteName: "Ahanak",
-      images: [
-        {
-          url: previewImageUrl,
-          width: 1800,
-          height: 1600,
-          alt: product?.name,
-        },
-      ],
-      locale: "fa_IR",
-      type: "article",
+    title: `${product.name} | فروشگاه آهنک`,
+    description: product.shortDescription,
+    alternates: {
+      canonical: `${siteURL}/products/${product.slug.current}`,
     },
-
+    openGraph: {
+      title: product.name,
+      description: product.shortDescription,
+      url: `${siteURL}/products/${product.slug.current}`,
+      images: [{ url: previewImg }],
+    },
     twitter: {
       card: "summary_large_image",
-      title: `${product?.name} | Ahanak`,
-      description: `${product?.shortDescription?.slice(0, 150) || ""}...`,
-      images: [previewImageUrl],
+      title: product?.name,
+      description: product?.shortDescription,
+      images: [previewImg],
     },
   };
 }
 
-// -----------------------------
-// Page Component (Safe)
-// -----------------------------
+// ---------------------------
+// Product Page Component
+// ---------------------------
 const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
   const product = await getProduct(slug);
 
-  if (!product) notFound();
+  if (!product) return notFound();
 
-  const previewImageUrl = product?.previewImages?.[0]?.image
-      ? imageBuilder(product.previewImages[0].image).url()
-      : "";
+  const previewImg =
+      product?.previewImages?.[0]?.image &&
+      imageBuilder(product.previewImages[0].image).url();
 
+  // ---------------------------
+  // Structured Data for Algolia
+  // ---------------------------
   await structuredAlgoliaHtmlData({
     type: "products",
-    title: product?.name,
-    htmlString: product?.shortDescription || "",
+    title: product?.name ?? "",
+    htmlString: product?.shortDescription ?? "",
     pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product?.slug?.current}`,
-    imageURL: previewImageUrl || "",
-    price: product?.price,
-    discountedPrice: product?.discountedPrice,
-    reviews: product?.reviews?.length || 0,
+    imageURL: previewImg ?? "",
+    price: product?.price ?? undefined,
+    discountedPrice: product?.discountedPrice ?? undefined,
+    reviews: product?.reviews?.length ?? 0,
+
+    // 🔥 مهم: null حذف شد، همیشه یا object یا undefined
     category: product?.category ?? undefined,
-    colors: product?.colors || [],
-    sizes: product?.sizes || [],
+
+    colors: product?.colors ?? [],
+    sizes: product?.sizes ?? [],
     _id: product?._id,
-    thumbnails: product?.thumbnails || [],
-    status: product?.status,
-    previewImages: product?.previewImages || [],
+    thumbnails: product?.thumbnails ?? [],
+    status: product?.status ?? true,
+    previewImages: product?.previewImages ?? [],
   });
 
   return (
