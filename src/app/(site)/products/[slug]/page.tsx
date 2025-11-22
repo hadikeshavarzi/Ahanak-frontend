@@ -7,6 +7,9 @@ import {
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
+// -----------------------------
+// Generate static paths
+// -----------------------------
 export async function generateStaticParams() {
   const products = await getAllProducts();
   return products.map((product) => ({
@@ -18,102 +21,92 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+// -----------------------------
+// Metadata with Safe Fallbacks
+// -----------------------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
+
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
+  const placeholder = "/placeholder.png";
 
   if (!product) {
     return {
       title: "Not Found",
-      description: "No blog article has been found",
+      description: "No product found",
     };
   }
 
-  return {
-    title: `${
-      product.name || "Single Product Page"
-    } | NextMerce - Next.js E-commerce Template`,
-    description: `${product?.shortDescription?.slice(0, 136)}...`,
-    author: "NextMerce",
-    alternates: {
-      canonical: `${siteURL}/products/${product?.slug?.current}`,
-      languages: {
-        "en-US": "/en-US",
-        "de-DE": "/de-DE",
-      },
-    },
+  const previewImageUrl = product?.previewImages?.[0]?.image
+      ? imageBuilder(product.previewImages[0].image).url()
+      : placeholder;
 
-    robots: {
-      index: true,
-      follow: true,
-      nocache: true,
-      googleBot: {
-        index: true,
-        follow: false,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
-    },
+  return {
+    title: `${product?.name || "Single Product Page"} | Ahanak`,
+    description: `${product?.shortDescription?.slice(0, 150) || ""}...`,
 
     openGraph: {
-      title: `${product?.name} | NextMerce`,
-      description: product.shortDescription,
+      title: `${product?.name} | Ahanak`,
+      description: product?.shortDescription,
       url: `${siteURL}/products/${product?.slug?.current}`,
-      siteName: "NextMerce",
+      siteName: "Ahanak",
       images: [
         {
-          url: imageBuilder(product?.previewImages[0]?.image).url(),
+          url: previewImageUrl,
           width: 1800,
           height: 1600,
           alt: product?.name,
         },
       ],
-      locale: "en_US",
+      locale: "fa_IR",
       type: "article",
     },
 
     twitter: {
       card: "summary_large_image",
-      title: `${product?.name} | NextMerce`,
-      description: `${product?.shortDescription?.slice(0, 136)}...`,
-      creator: "@NextMerce",
-      site: "@NextMerce",
-      images: [imageBuilder(product?.previewImages[0]?.image).url()],
-      url: `${siteURL}/products/${product?.slug?.current}`,
+      title: `${product?.name} | Ahanak`,
+      description: `${product?.shortDescription?.slice(0, 150) || ""}...`,
+      images: [previewImageUrl],
     },
   };
 }
 
+// -----------------------------
+// Page Component (Safe)
+// -----------------------------
 const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
   const product = await getProduct(slug);
 
   if (!product) notFound();
 
+  const previewImageUrl = product?.previewImages?.[0]?.image
+      ? imageBuilder(product.previewImages[0].image).url()
+      : "";
+
   await structuredAlgoliaHtmlData({
     type: "products",
     title: product?.name,
-    htmlString: product?.shortDescription,
-    pageUrl: `${process.env.SITE_URL}/products/${product?.slug?.current}`,
-    imageURL: imageBuilder(product?.previewImages[0]?.image).url() as string,
+    htmlString: product?.shortDescription || "",
+    pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product?.slug?.current}`,
+    imageURL: previewImageUrl,
     price: product?.price,
     discountedPrice: product?.discountedPrice,
-    reviews: product?.reviews.length,
-    category: product?.category,
-    colors: product?.colors as [],
-    sizes: product?.sizes as [],
+    reviews: product?.reviews?.length || 0,
+    category: product?.category || null,
+    colors: product?.colors || [],
+    sizes: product?.sizes || [],
     _id: product?._id,
-    thumbnails: product?.thumbnails,
+    thumbnails: product?.thumbnails || [],
     status: product?.status,
-    previewImages: product?.previewImages,
+    previewImages: product?.previewImages || [],
   });
 
   return (
-    <main>
-      <ShopDetails product={product} />
-    </main>
+      <main>
+        <ShopDetails product={product} />
+      </main>
   );
 };
 
