@@ -97,13 +97,9 @@ const ProductDetails = async ({ params }: Props) => {
     discountedPrice: product?.discountedPrice ?? undefined,
     reviews: product?.reviews?.length ?? 0,
     category: product?.category ?? undefined,
-    colors: product?.colors ?? undefined,
-    sizes: product?.sizes ?? undefined,
     _id: product?._id,
-    thumbnails: product?.thumbnails ?? undefined,
     status: product?.status ?? true,
-    previewImages: product?.previewImages ?? undefined,
-  });
+  } as any);
 
   return (
       <main>
