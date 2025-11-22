@@ -10,88 +10,59 @@ import {
   postQuery,
 } from './queries/blog-queries';
 import { sanityFetch } from './sanity-utils';
+import { createClient } from '@sanity/client';
+import clientConfig from './config/client-config';
+
+// 🔥 Server-side client — با Token
+const serverClient = createClient({
+  projectId: clientConfig.projectId!,
+  dataset: clientConfig.dataset!,
+  apiVersion: clientConfig.apiVersion,
+  token: process.env.SANITY_PROJECT_API_TOKEN,
+  useCdn: false,
+  perspective: "published",
+});
 
 export async function getPostCategories() {
-  const data: Category[] = await sanityFetch({
-    query: postCategoryQuery,
-    qParams: {},
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Category[]>(postCategoryQuery);
 }
 
 export async function getPostTags() {
-  const data: Blog[] = await sanityFetch({
-    query: groq`*[_type == "post" && defined(tags)] {
-      'tags': tags[]
-    }`,
-    qParams: {},
-    tags: ['post'],
-  });
-
-  return data;
+  return serverClient.fetch<any>(
+      groq`*[_type == "post" && defined(tags)]{ "tags": tags[] }`
+  );
 }
+
 export async function getAuthorBySlug(slug: string) {
-  const data = await sanityFetch({
-    query: authorBySlugQuery,
-    qParams: { slug },
-    tags: ['author'],
-  });
-  return data;
+  return serverClient.fetch(authorBySlugQuery, { slug });
 }
 
 export async function getPosts() {
-  const data: Blog[] = await sanityFetch({
-    query: postQuery,
-    qParams: {},
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Blog[]>(postQuery);
 }
 
 export async function getPostsByLimit(limit: number) {
-  const data: Blog[] = await sanityFetch({
-    query: postQuery + `[0...${limit}]`,
-    qParams: {},
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Blog[]>(postQuery + `[0...${limit}]`);
 }
 
 export async function getPostsByAuthorSlug(authorSlug: string) {
-  const data = await sanityFetch({
-    query: groq`*[_type == "post" && author->slug.current == $authorSlug] ${postQuery}`,
-    qParams: { authorSlug },
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Blog[]>(
+      groq`*[_type == "post" && author->slug.current == $authorSlug] ${postQuery}`,
+      { authorSlug }
+  );
 }
 
 export async function getPostsByCategoryOrTag(slug: string) {
-  const query = `postCategory->slug.current == "${slug}"`;
-
-  const data: Blog[] = await sanityFetch({
-    query: groq`*[_type == "post" && ${query}] ${postData}`,
-    qParams: {},
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Blog[]>(
+      groq`*[_type == "post" && postCategory->slug.current == $slug] ${postData}`,
+      { slug }
+  );
 }
 
 export async function getCategoryBySlug(slug: string) {
-  const data: Category = await sanityFetch({
-    query: categoryBySlugQuery,
-    qParams: { slug },
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Category>(categoryBySlugQuery, { slug });
 }
 
 export async function getPost(slug: string) {
-  const data: Blog = await sanityFetch({
-    query: postBySlugQuery,
-    qParams: { slug },
-    tags: ['post'],
-  });
-  return data;
+  return serverClient.fetch<Blog>(postBySlugQuery, { slug });
 }
