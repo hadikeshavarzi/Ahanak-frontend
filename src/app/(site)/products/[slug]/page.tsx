@@ -13,13 +13,15 @@ import { notFound } from "next/navigation";
 export async function generateStaticParams() {
   const products = await getAllProducts();
 
-  return products
-      .filter((product): product is typeof product & { slug: { current: string } } =>
-          Boolean(product?.slug?.current)
-      )
-      .map((product) => ({
-        slug: product.slug.current,
-      }));
+  // فیلتر محصولات که slug دارند
+  const validProducts = products.filter(
+      (product) => product?.slug?.current
+  );
+
+  // map کردن به فرمت مورد نیاز
+  return validProducts.map((product) => ({
+    slug: product.slug!.current, // اینجا مطمئنیم که slug وجود داره
+  }));
 }
 
 // ---------------------------
