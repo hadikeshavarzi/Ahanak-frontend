@@ -14,10 +14,9 @@ export async function generateStaticParams() {
   const products = await getAllProducts();
 
   return products
-      .filter((p) => p?.slug?.current)
-      .map((product) => ({
-        slug: product.slug?.current as string,
-      }));
+      .map((product) => product?.slug?.current)
+      .filter((slug): slug is string => Boolean(slug))
+      .map((slug) => ({ slug }));
 }
 
 // ---------------------------
