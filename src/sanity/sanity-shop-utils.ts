@@ -2,9 +2,11 @@ import { Category } from "@/types/category";
 import { Countdown } from "@/types/countdown";
 import { Order } from "@/types/order";
 import { Product } from "@/types/product";
-import ImageUrlBuilder from "@sanity/image-url";
+
+import imageUrlBuilder from "@sanity/image-url";
 import { createClient, groq } from "next-sanity";
 import { unstable_cache as cache } from "next/cache";
+
 import clientConfig from "./config/client-config";
 import {
   allCategoriesQuery,
@@ -17,30 +19,47 @@ import {
   orderData,
   productData,
 } from "./queries/shop-queries";
+
 import { sanityFetch } from "./sanity-utils";
+
+// ----------------------------
+// 🟩 ساخت Sanity Client
+// ----------------------------
 
 const client = createClient(clientConfig);
 
+// ----------------------------
+// 🟩 ساخت image builder – حل خطای Vercel
+// ----------------------------
+
+const builder = imageUrlBuilder(client);
+
+export function imageBuilder(source: any) {
+  return builder.image(source);
+}
+
+// ----------------------------
+// 🟩 Queries
+// ----------------------------
+
 export async function getCategories() {
-  const data: Category[] = await sanityFetch({
+  return sanityFetch<Category[]>({
     query: allCategoriesQuery,
     qParams: {},
     tags: ["category"],
   });
-  return data;
 }
 
 export async function getCategoryBySlug(slug: string) {
-  const data: Category = await sanityFetch({
+  return sanityFetch<Category>({
     query: allCategoriesQuery,
     qParams: { slug },
     tags: ["category"],
   });
-  return data;
 }
 
 export async function getCategoryById(id: string) {
-  return await sanityFetch<Category>({
+  return sanityFetch<Category>({
     query: categoryByIdQuery,
     qParams: { id },
     tags: ["category"],
@@ -90,22 +109,24 @@ export async function getHighestPrice() {
 export async function getOrders(query: string) {
   const orderQuery = groq`*[_type == "order" ${query}] | order(_createdAt desc) ${orderData}`;
 
-  const data: Order[] = await sanityFetch({
+  return sanityFetch<Order[]>({
     query: orderQuery,
     qParams: {},
     tags: ["order"],
   });
-  return data;
 }
 
 export async function getOrderById(orderId: string) {
-  const data: Order = await sanityFetch({
+  return sanityFetch<Order>({
     query: orderByIdQuery,
     qParams: { orderId },
     tags: ["order"],
   });
-  return data;
 }
+
+// ----------------------------
+// 🟩 Hero Banners
+// ----------------------------
 
 export const getHeroBanners = cache(
     async () =>
@@ -129,8 +150,12 @@ export const getHeroSliders = cache(
     { tags: ["heroSlider"] }
 );
 
+// ----------------------------
+// 🟩 Coupons
+// ----------------------------
+
 export async function getCoupons() {
-  return createClient(clientConfig).fetch(
+  return client.fetch(
       groq`*[_type == "coupon"] {
       _id,
       name,
@@ -142,16 +167,14 @@ export async function getCoupons() {
   );
 }
 
+// ----------------------------
+// 🟩 Countdown
+// ----------------------------
+
 export async function getCountdown() {
-  const data: Countdown = await sanityFetch({
+  return sanityFetch<Countdown>({
     query: countdownQuery,
     qParams: {},
     tags: ["countdown"],
   });
-  return data;
-}
-
-// ✅ تغییر اینجا: از client به جای clientConfig استفاده کنید
-export function imageBuilder(source: any) {
-  return ImageUrlBuilder(client).image(source);
 }
