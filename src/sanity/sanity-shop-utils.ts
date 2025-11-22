@@ -56,17 +56,17 @@ export async function getAllProducts() {
 }
 
 export const getProductsByFilter = cache(
-  async (query: string, tags: string[]) => {
-    const filterQuery = groq`${query} ${productData}`;
+    async (query: string, tags: string[]) => {
+      const filterQuery = groq`${query} ${productData}`;
 
-    return sanityFetch<Product[]>({
-      query: filterQuery,
-      qParams: {},
-      tags,
-    });
-  },
-  ["filtered-products"],
-  { tags: ["product"] }
+      return sanityFetch<Product[]>({
+        query: filterQuery,
+        qParams: {},
+        tags,
+      });
+    },
+    ["filtered-products"],
+    { tags: ["product"] }
 );
 
 export async function getAllProductsCount() {
@@ -83,7 +83,7 @@ export async function getProduct(slug: string) {
 
 export async function getHighestPrice() {
   return client.fetch<number>(
-    groq`*[_type == "product"] | order(price desc)[0].price`
+      groq`*[_type == "product"] | order(price desc)[0].price`
   );
 }
 
@@ -98,7 +98,6 @@ export async function getOrders(query: string) {
   return data;
 }
 
-// fetch unique orders by orderId
 export async function getOrderById(orderId: string) {
   const data: Order = await sanityFetch({
     query: orderByIdQuery,
@@ -109,30 +108,30 @@ export async function getOrderById(orderId: string) {
 }
 
 export const getHeroBanners = cache(
-  async () =>
-    sanityFetch<any>({
-      query: heroBannerQuery,
-      qParams: {},
-      tags: ["heroBanner"],
-    }),
-  ["hero-banners"],
-  { tags: ["heroBanner"] }
+    async () =>
+        sanityFetch<any>({
+          query: heroBannerQuery,
+          qParams: {},
+          tags: ["heroBanner"],
+        }),
+    ["hero-banners"],
+    { tags: ["heroBanner"] }
 );
 
 export const getHeroSliders = cache(
-  async () =>
-    sanityFetch<any>({
-      query: heroSliderQuery,
-      qParams: {},
-      tags: ["heroSlider"],
-    }),
-  ["hero-sliders"],
-  { tags: ["heroSlider"] }
+    async () =>
+        sanityFetch<any>({
+          query: heroSliderQuery,
+          qParams: {},
+          tags: ["heroSlider"],
+        }),
+    ["hero-sliders"],
+    { tags: ["heroSlider"] }
 );
 
 export async function getCoupons() {
   return createClient(clientConfig).fetch(
-    groq`*[_type == "coupon"] {
+      groq`*[_type == "coupon"] {
       _id,
       name,
       code,
@@ -152,6 +151,7 @@ export async function getCountdown() {
   return data;
 }
 
+// ✅ تغییر اینجا: از client به جای clientConfig استفاده کنید
 export function imageBuilder(source: any) {
-  return ImageUrlBuilder(clientConfig).image(source);
+  return ImageUrlBuilder(client).image(source);
 }
