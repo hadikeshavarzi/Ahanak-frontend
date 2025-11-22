@@ -6,18 +6,19 @@ import {
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
+// اضافه کردن این خط مهمه
+export const revalidate = 3600;
+
 // ---------------------------
 // Generate Static Params
 // ---------------------------
 export async function generateStaticParams() {
   const products = await getAllProducts();
 
-  // فیلتر محصولات که slug دارند
   const validProducts = products.filter(
       (product) => product?.slug?.current
   );
 
-  // map کردن به فرمت مورد نیاز
   return validProducts.map((product) => ({
     slug: product.slug!.current,
   }));
