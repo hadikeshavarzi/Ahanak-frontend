@@ -1,18 +1,29 @@
 import ShopDetails from "@/components/ShopDetails";
-import { getProduct, imageBuilder } from "@/sanity/sanity-shop-utils";
+import { getAllProducts, getProduct, imageBuilder } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// صفحه کاملاً داینامیک
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = "force-dynamic"; // مهم برای اینکه runtime dynamic error ندهد
+
+// ---------------------------
+// Build-Time Static Params
+// ---------------------------
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+
+  return products
+      .filter((p) => p?.slug?.current)
+      .map((product) => ({
+        slug: product.slug.current,
+      }));
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// -----------------
-// META
-// -----------------
+// ---------------------------
+// SEO Metadata (Safe Version)
+// ---------------------------
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
@@ -25,6 +36,7 @@ export async function generateMetadata({ params }: Props) {
     };
   }
 
+  const canonicalSlug = product?.slug?.current || "";
   const previewImage =
       product?.previewImages?.[0]?.image
           ? imageBuilder(product.previewImages[0].image).url()
@@ -34,7 +46,7 @@ export async function generateMetadata({ params }: Props) {
     title: `${product.name} | Ahanak`,
     description: product.shortDescription || "",
     alternates: {
-      canonical: `${siteURL}/products/${product.slug.current}`,
+      canonical: `${siteURL}/products/${canonicalSlug}`,
     },
     openGraph: {
       title: product.name,
@@ -47,7 +59,6 @@ export async function generateMetadata({ params }: Props) {
           alt: product.name,
         },
       ],
-      type: "article",
     },
     twitter: {
       card: "summary_large_image",
@@ -58,12 +69,11 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-// -----------------
-// PAGE
-// -----------------
+// ---------------------------
+// Product Page
+// ---------------------------
 const ProductDetails = async ({ params }: Props) => {
   const { slug } = await params;
-
   const product = await getProduct(slug);
 
   if (!product) notFound();
