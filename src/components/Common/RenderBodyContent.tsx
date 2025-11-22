@@ -1,19 +1,27 @@
 import { Blog } from "@/types/blogItem";
 import { PortableText } from "@portabletext/react";
 import { getImageDimensions } from "@sanity/asset-utils";
-import urlBuilder from "@sanity/image-url";
-import config from "@/sanity/config/client-config"; // ❗ مهم
+import imageUrlBuilder from "@sanity/image-url";
+import { createClient } from "@sanity/client";
+import config from "@/sanity/config/client-config";
 import Image from "next/image";
 
-// Lazy-loaded image component
+// ---------------------------------------------
+// 🔥 ساخت کلاینت رسمی Sanity فقط برای Image Builder
+// ---------------------------------------------
+const sanityClient = createClient({
+    projectId: config.projectId!,
+    dataset: config.dataset!,
+    apiVersion: config.apiVersion,
+    useCdn: true,
+});
+
+const builder = imageUrlBuilder(sanityClient);
+
 const SampleImageComponent = ({ value, isInline }: any) => {
     const { width, height } = getImageDimensions(value);
 
-    const imageUrl = urlBuilder(config)
-        .image(value)
-        .fit("max")
-        .auto("format")
-        .url();
+    const imageUrl = builder.image(value).fit("max").auto("format").url();
 
     return (
         <Image
@@ -36,12 +44,10 @@ const components = {
     },
 };
 
-const RenderBodyContent = ({ post }: { post: Blog }) => {
+export default function RenderBodyContent({ post }: { post: Blog }) {
     return (
         <div className="prose prose-lg max-w-none">
             <PortableText value={post?.body || []} components={components} />
         </div>
     );
-};
-
-export default RenderBodyContent;
+}
