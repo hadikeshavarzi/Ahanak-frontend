@@ -6,10 +6,9 @@ import {
 } from "@/sanity/sanity-shop-utils";
 import { notFound } from "next/navigation";
 
-// تنظیمات cache
-export const revalidate = 3600;
-export const dynamic = 'force-static';
-export const fetchCache = 'force-cache';
+// تغییر به dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // ---------------------------
 // Generate Static Params
