@@ -1,12 +1,32 @@
 @import url("https://fonts.cdnfonts.com/css/general-sans");
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
+
+/* ==================== RTL Configuration ==================== */
+@layer base {
+  html {
+    direction: rtl !important;
+    font-family: 'Vazirmatn', 'General Sans', sans-serif !important;
+  }
+  
+  body {
+    direction: rtl !important;
+    text-align: right !important;
+  }
+  
+  * {
+    direction: rtl;
+  }
+}
+/* ==================== End RTL Configuration ==================== */
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   /* --font-*: initial; */
   /* --font-euclid-circular-a: Euclid Circular A; */
+  --font-vazir: 'Vazirmatn', sans-serif;
   --font-gsans: "General Sans", sans-serif;
 
   --color-*: initial;
@@ -275,7 +295,7 @@
 
 /* third-party libraries CSS */
 
-/* clears the ‘X’ from Internet Explorer */
+/* clears the 'X' from Internet Explorer */
 input[type="search"]::-ms-clear {
   display: none;
   width: 0;
@@ -286,7 +306,7 @@ input[type="search"]::-ms-reveal {
   width: 0;
   height: 0;
 }
-/* clears the ‘X’ from Chrome */
+/* clears the 'X' from Chrome */
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
